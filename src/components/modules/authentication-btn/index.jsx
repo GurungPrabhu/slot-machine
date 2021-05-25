@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-one-expression-per-line */
+/* eslint-disable comma-dangle */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react/jsx-no-comment-textnodes */
 import React, { useState } from "react";
@@ -5,20 +7,11 @@ import { useSelector, useDispatch } from "react-redux";
 import PropTypes from "prop-types";
 import { error, success } from "../../../utils/toast";
 import { login, logout, signUp } from "../../../redux/action/auth";
+import Button from "../../elements/button";
+import { loggedIn, loggedOut } from "../../../redux/action/game";
 
-const Button = ({ text, onClick }) => (
-  <button className="btn btn-primary m-2" type="button" onClick={onClick}>
-    {text}
-  </button>
-);
-
-Button.propTypes = {
-  text: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired,
-};
 const InputComponent = ({ onSubmit, btnName, onCancel }) => {
   const [username, setUsername] = useState("");
-
   const onClickSubmit = () => {
     if (username.length > 0) {
       onSubmit(username);
@@ -70,7 +63,7 @@ const AuthenticationComponent = () => {
 
   const [loginMode, setLoginMode] = useState(false);
   const [signUpMode, setSignUpMode] = useState(false);
-
+  const gameData = useSelector((store) => store.game.currentData);
   const validateRegistration = (string) => {
     if (!auth.database.includes(string)) return true;
     return false;
@@ -84,18 +77,20 @@ const AuthenticationComponent = () => {
   const onSubmitLogin = (username) => {
     if (validateLogin(username)) {
       dispatch(login(username));
+      dispatch(loggedIn(auth.username));
       success("Login successfull!");
       setLoginMode(false);
-    } else error("Login Error");
+    } else error("No user found");
   };
 
   const onSubmitSignUp = (value) => {
     if (validateRegistration(value)) {
       dispatch(signUp(value));
+      dispatch(loggedIn(value));
       success("Sign up successfull");
       setSignUpMode(false);
     } else {
-      error("Error");
+      error("Already registere");
     }
   };
 
@@ -104,6 +99,7 @@ const AuthenticationComponent = () => {
     const answer = window.confirm("Do you want to logout?");
     if (answer) {
       dispatch(logout());
+      dispatch(loggedOut());
     }
   };
 
@@ -127,6 +123,11 @@ const AuthenticationComponent = () => {
   return (
     <>
       <div>
+        <span>
+          {" "}
+          Currency:
+          {gameData?.balance || 0}{" "}
+        </span>
         {auth.loggedIn && <span>{auth.username}</span>}
 
         {/* Toggle buttons mode  */}

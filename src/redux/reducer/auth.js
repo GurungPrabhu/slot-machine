@@ -18,6 +18,7 @@ const authReducer = (state = INITIALSTATE, action) => {
       return {
         ...state,
         username: action.payload,
+        loggedIn: true,
         database: [...state.database, action.payload],
       };
     }
